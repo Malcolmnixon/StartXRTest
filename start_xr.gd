@@ -54,7 +54,7 @@ var xr_active : bool = false
 var xr_frame_rate : float = 0
 
 # Is a WebXR is_session_supported query running
-var _webxr_in_session_query : bool = false
+var _webxr_session_query : bool = false
 
 
 # Handle auto-initialization when ready
@@ -231,7 +231,7 @@ func _setup_for_webxr() -> bool:
 	# This returns immediately - our _webxr_session_supported() method
 	# (which we connected to the "session_supported" signal above) will
 	# be called sometime later to let us know if it's supported or not.
-	_webxr_in_session_query = true
+	_webxr_session_query = true
 	var blend_mode := int(
 		ProjectSettings.get_setting_with_override("xr/openxr/environment_blend_mode"))
 	if blend_mode == XRInterface.XR_ENV_BLEND_MODE_OPAQUE:
@@ -247,14 +247,14 @@ func _setup_for_webxr() -> bool:
 
 # Handle WebXR session supported check
 func _on_webxr_session_supported(session_mode: String, supported: bool) -> void:
-	# Skip if we're not running a query
-	if not _webxr_in_session_query:
+	# Skip if not running session-query
+	if not _webxr_session_query:
 		return
 
 	# Clear the query flag
-	_webxr_in_session_query = false
+	_webxr_session_query = false
 
-	# Handle unsupported
+	# Report if not supported
 	if not supported:
 		OS.alert("Your web browser doesn't support " + session_mode + ". Sorry!")
 		return
