@@ -1,0 +1,63 @@
+[gd_scene load_steps=7 format=3 uid="uid://dtjhs5k1puk02"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_78n5i"]
+[ext_resource type="PackedScene" uid="uid://dq0pjjvak2cp" path="res://start_xr.tscn" id="1_v1lxv"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_dk8ef"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_6amfd"]
+sky_material = SubResource("ProceduralSkyMaterial_dk8ef")
+
+[sub_resource type="Environment" id="Environment_im4g0"]
+background_mode = 2
+sky = SubResource("Sky_6amfd")
+tonemap_mode = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_8bnyq"]
+size = Vector3(0.1, 0.1, 0.1)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_78n5i")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_im4g0")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+
+[node name="LeftController" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1, 0)
+tracker = &"left_hand"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/LeftController"]
+mesh = SubResource("BoxMesh_8bnyq")
+
+[node name="RightController" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1, 0)
+tracker = &"right_hand"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/RightController"]
+mesh = SubResource("BoxMesh_8bnyq")
+
+[node name="StartXR" parent="." instance=ExtResource("1_v1lxv")]
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3)
+text = "Frame Rate: 0
+Physics Rate: 0"
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.5
+autostart = true
+
+[connection signal="xr_mode_change" from="StartXR" to="." method="_on_start_xr_xr_mode_change"]
+[connection signal="xr_started" from="StartXR" to="." method="_on_start_xr_xr_started"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
